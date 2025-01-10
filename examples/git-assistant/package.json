@@ -1,0 +1,16 @@
+{
+  "name": "git-assistant",
+  "version": "1.0.0",
+  "description": "Git 操作助手插件",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "dev": "tsc -w"
+  },
+  "dependencies": {
+    "commander": "^11.0.0",
+    "ai-agent-sdk": "workspace:*"
+  }
+} 

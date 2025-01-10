@@ -1,0 +1,14 @@
+{
+  "name": "hello-plugin",
+  "version": "1.0.0",
+  "description": "一个示例插件",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "commander": "^11.0.0",
+    "ai-agent-sdk": "workspace:*"
+  }
+} 
