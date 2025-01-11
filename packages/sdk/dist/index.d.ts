@@ -2,6 +2,7 @@ export interface AgentPlugin {
     name: string;
     version: string;
     description: string;
+    commandPrefix?: string;
     onLoad?: () => Promise<void>;
     onUnload?: () => Promise<void>;
     commands?: Record<string, CommandHandler>;
@@ -30,7 +31,7 @@ export interface Logger {
     debug(message: string): void;
 }
 export interface Config {
-    get(key: string): any;
+    get(key: string): Promise<any>;
     set(key: string, value: any): Promise<void>;
 }
 export declare class PluginError extends Error {
@@ -42,3 +43,5 @@ export interface PluginManager {
     list(): AgentPlugin[];
     get(pluginName: string): AgentPlugin | undefined;
 }
+export {};
+//# sourceMappingURL=index.d.ts.map

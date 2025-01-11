@@ -3,10 +3,11 @@ export interface AgentPlugin {
   name: string;
   version: string;
   description: string;
-  
+  commandPrefix?: string;
+
   onLoad?: () => Promise<void>;
   onUnload?: () => Promise<void>;
-  
+
   commands?: Record<string, CommandHandler>;
 }
 
@@ -14,7 +15,7 @@ export interface AgentPlugin {
 export interface CommandHandler {
   execute: (args: string[], context: CommandContext) => Promise<void>;
   description: string;
-  setup?: (command: any) => void;  // 用于设置命令参数和选项
+  setup?: (command: any) => void; // 用于设置命令参数和选项
 }
 
 // 命令上下文
@@ -43,7 +44,7 @@ export interface Logger {
 
 // 配置接口
 export interface Config {
-  get(key: string): any;
+  get(key: string): Promise<any>;
   set(key: string, value: any): Promise<void>;
 }
 
@@ -51,7 +52,7 @@ export interface Config {
 export class PluginError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = 'PluginError';
+    this.name = "PluginError";
   }
 }
 
@@ -61,4 +62,6 @@ export interface PluginManager {
   unload(pluginName: string): Promise<void>;
   list(): AgentPlugin[];
   get(pluginName: string): AgentPlugin | undefined;
-} 
+}
+
+export {};

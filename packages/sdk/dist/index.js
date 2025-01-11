@@ -5,7 +5,7 @@ exports.PluginError = void 0;
 class PluginError extends Error {
     constructor(message) {
         super(message);
-        this.name = 'PluginError';
+        this.name = "PluginError";
     }
 }
 exports.PluginError = PluginError;

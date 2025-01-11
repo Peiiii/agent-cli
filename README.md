@@ -1,37 +1,46 @@
 # 🤖 AI Agent CLI
 
 ## 简介
-AI Agent CLI 是一个由 AI 驱动的智能命令行代理工具。它提供少量核心命令，通过插件系统实现无限扩展。
+AI Agent CLI 是一个由 AI 驱动的智能命令行代理工具。它采用模块化设计，通过强大的插件系统支持功能扩展。
 
-## 🌟 核心命令
+## 🌟 核心功能
+
+- 🎯 智能命令解析与执行
+- 🔌 灵活的插件系统
+- 🤖 AI 驱动的交互式助手
+- 🛠️ 完整的开发工具链
+
+## 📦 安装
 
 ```bash
+npm install -g ai-agent-cli
+# 或
+yarn global add ai-agent-cli
+```
+
+## 🚀 快速开始
+
+```bash
+# 初始化配置
+agent init
+
+# 查看可用命令
+agent help
+
 # 启动交互式 AI 助手
 agent chat
 
-# 执行任意指令（自然语言）
-agent exec "你的指令"
-
 # 插件管理
-agent plugin [install|remove|list|update]
-
-# 查看帮助
-agent help
+agent plugin list                # 列出已安装插件
+agent plugin install <name>      # 安装插件
+agent plugin remove <name>       # 移除插件
+agent plugin update [name]       # 更新插件
+agent plugin create <name>       # 创建新插件
 ```
 
-## 🔌 插件系统
+## ⚙️ 配置文件
 
-插件可以扩展任何功能，例如：
-
-```bash
-# 安装 Git 助手插件
-agent plugin install git-assistant
-
-# 使用插件功能
-agent git commit "feat: add new feature"
-```
-
-## 🔧 配置
+配置文件位于 `~/.ai-agent/config.json`：
 
 ```json
 {
@@ -41,29 +50,80 @@ agent git commit "feat: add new feature"
     "apiKey": "your-api-key"
   },
   "plugins": {
-    "enabled": []
+    "enabled": [],
+    "registry": "https://registry.npmjs.org"
+  },
+  "logging": {
+    "level": "info",
+    "file": "~/.ai-agent/logs/agent.log"
   }
 }
 ```
 
-## 🚀 示例
+## 🔌 插件系统
 
-```bash
-# 通过自然语言执行任务
-agent exec "创建一个新的 React 项目"
-agent exec "检查并修复代码中的 TypeScript 错误"
-agent exec "部署当前项目到生产环境"
-
-# 交互式对话
-agent chat
-> 帮我优化这段代码的性能
-> 解释一下这个错误信息
+### 插件结构
+```
+my-plugin/
+├── package.json
+├── src/
+│   ├── index.ts          # 插件入口
+│   ├── commands/         # 命令实现
+│   └── types.ts          # 类型定义
+└── README.md             # 插件文档
 ```
 
-## 📚 插件开发
+### 插件示例
 
-参考 [插件开发指南](./docs/plugin-development.md) 来创建你自己的插件。
+```typescript
+// my-plugin/src/index.ts
+import { Plugin } from 'ai-agent-cli';
+
+export default class MyPlugin implements Plugin {
+  name = 'my-plugin';
+  version = '1.0.0';
+  
+  commands = {
+    'my-command': {
+      description: '我的自定义命令',
+      action: async (args) => {
+        // 命令实现
+      }
+    }
+  };
+}
+```
+
+## 🛠️ 开发者指南
+
+1. 克隆仓库
+```bash
+git clone https://github.com/your-username/ai-agent-cli.git
+cd ai-agent-cli
+```
+
+2. 安装依赖
+```bash
+pnpm install
+```
+
+3. 开发模式运行
+```bash
+pnpm dev
+```
+
+4. 构建项目
+```bash
+pnpm build
+```
+
+## 📚 文档
+
+- [完整文档](./docs/README.md)
+- [插件开发指南](./docs/plugin-development.md)
+- [API 参考](./docs/api-reference.md)
+- [贡献指南](./CONTRIBUTING.md)
 
 ## 📄 许可证
 
-MIT License
+MIT License © 2024

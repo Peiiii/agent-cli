@@ -1,4 +1,4 @@
-import { AgentPlugin, CommandContext } from 'ai-agent-sdk';
+import { AgentPlugin, CommandContext } from '@ai-agent/sdk';
 import { Command } from 'commander';
 export default class GitAssistantPlugin implements AgentPlugin {
     name: string;

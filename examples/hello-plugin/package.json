@@ -9,6 +9,6 @@
   },
   "dependencies": {
     "commander": "^11.0.0",
-    "ai-agent-sdk": "workspace:*"
+    "@ai-agent/sdk": "workspace:*"
   }
 } 

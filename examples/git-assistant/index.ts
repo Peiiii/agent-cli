@@ -1,4 +1,4 @@
-import { AgentPlugin, CommandContext } from 'ai-agent-sdk';
+import { AgentPlugin, CommandContext } from '@ai-agent/sdk';
 import { Command } from 'commander';
 import { exec } from 'child_process';
 import { promisify } from 'util';

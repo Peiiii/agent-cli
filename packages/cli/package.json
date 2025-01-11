@@ -1,15 +1,18 @@
 {
-  "name": "@ai-agent/sdk",
+  "name": "@ai-agent/cli",
   "version": "1.0.0",
-  "description": "SDK for AI Agent CLI plugin development",
+  "description": "AI-powered command line interface",
   "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "bin": {
+    "agent": "./dist/index.js"
+  },
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
     "test": "jest",
     "lint": "eslint src --ext .ts",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist",
+    "start": "node dist/index.js"
   },
   "files": [
     "dist",
@@ -18,12 +21,21 @@
   "keywords": [
     "ai",
     "cli",
-    "sdk",
-    "plugin"
+    "agent",
+    "command-line"
   ],
   "author": "",
   "license": "MIT",
+  "dependencies": {
+    "@ai-agent/sdk": "workspace:*",
+    "commander": "^11.0.0",
+    "chalk": "^5.0.0",
+    "inquirer": "^9.0.0",
+    "ora": "^7.0.0",
+    "openai": "^4.0.0"
+  },
   "devDependencies": {
+    "@types/inquirer": "^9.0.0",
     "@types/node": "^20.0.0",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
@@ -31,8 +43,5 @@
     "jest": "^29.0.0",
     "rimraf": "^5.0.0",
     "typescript": "^5.0.0"
-  },
-  "peerDependencies": {
-    "commander": "^11.0.0"
   }
-}
+} 
