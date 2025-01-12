@@ -1,4 +1,4 @@
-export interface AIClient {
+export interface IAIClient {
   generate(options: {
     prompt: string;
     temperature?: number;

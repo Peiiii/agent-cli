@@ -1,3 +1,5 @@
+import { Command } from "commander";
+
 // 插件接口
 export interface AgentPlugin {
   name: string;
@@ -11,11 +13,16 @@ export interface AgentPlugin {
   commands?: Record<string, CommandHandler>;
 }
 
+export interface AgentPluginClass {
+  new(): AgentPlugin;
+}
+
+
 // 命令处理器接口
 export interface CommandHandler {
   execute: (args: string[], context: CommandContext) => Promise<void>;
   description: string;
-  setup?: (command: any) => void; // 用于设置命令参数和选项
+  setup?: (command: Command) => void; // 用于设置命令参数和选项
 }
 
 // 命令上下文
@@ -44,8 +51,8 @@ export interface Logger {
 
 // 配置接口
 export interface Config {
-  get(key: string): Promise<any>;
-  set(key: string, value: any): Promise<void>;
+  get<T>(key: string): Promise<T>;
+  set<T>(key: string, value: T): Promise<void>;
 }
 
 // 错误类
@@ -64,4 +71,5 @@ export interface PluginManager {
   get(pluginName: string): AgentPlugin | undefined;
 }
 
-export {};
+export { };
+

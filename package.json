@@ -3,10 +3,11 @@
   "private": true,
   "scripts": {
     "watch": "pnpm -r watch",
-    "build": "pnpm -r build",
+    "build": "pnpm lint && pnpm -r build",
     "clean": "pnpm -r clean",
     "test": "pnpm -r test",
-    "lint": "pnpm -r lint",
+    "lint": "eslint 'packages/**/src/**/*.ts'",
+    "lint:fix": "eslint 'packages/**/src/**/*.ts' --fix",
     "dev": "pnpm --filter @ai-agent/cli dev",
     "link-cli": "cd packages/cli && pnpm link --global"
   },

@@ -1,14 +1,23 @@
 #!/usr/bin/env node
 
 import { Command } from "commander";
-import { PluginLoader } from "./core/plugin/loader";
-import { PluginError } from "./core/utils/errors";
-import { Logger } from "./core/utils/logger";
-import { Plugin, CommandHandler } from "./types";
+import os from 'os';
 import path from "path";
+import { AIClient } from "./core/ai";
+import { ConfigManager } from "./core/config";
+import { PluginLoader } from "./core/plugin/loader";
+import { CommandContext, PluginError } from "./core/utils/errors";
+import { Logger } from "./core/utils/logger";
 
 const logger = new Logger();
-const pluginLoader = new PluginLoader(logger);
+const configManager = new ConfigManager(path.join(os.homedir(), '.ai-agent', 'config.json'));
+const pluginLoader = new PluginLoader(logger, configManager);
+const aiClient = new AIClient();
+const commandContext: CommandContext = {
+  logger: logger,
+  ai: aiClient,
+  config: configManager,
+};
 
 // 将初始化逻辑放在主函数中
 async function main() {
@@ -17,74 +26,37 @@ async function main() {
 
   const program = new Command();
 
+  console.log("[agent] 启动中...");
+
   program
     .version("1.0.0")
     .description(
       "A CLI agent that supports command line access and extensibility"
     );
 
-  // 注册插件命令
-  for (const plugin of pluginLoader.list()) {
-    if (!plugin.commands) continue;
-
-    for (const [cmdPath, cmd] of Object.entries(plugin.commands)) {
-      // 支持自定义命令路径
-      const fullPath =
-        (plugin as Plugin).commandPrefix !== undefined
-          ? (plugin as Plugin).commandPrefix === "" // 检查是否为空字符串（根级别命令）
-            ? cmdPath // 根级别命令
-            : `${(plugin as Plugin).commandPrefix} ${cmdPath}` // 自定义前缀
-          : `${plugin.name} ${cmdPath}`; // 默认使用插件名作为前缀
-
-      // 检查命令路径是否已被注册
-      if (program.commands.some((cmd) => cmd.name() === fullPath)) {
-        logger.warn(`命令 "${fullPath}" 已被其他插件注册，跳过`);
-        continue;
-      }
-
-      const command = program
-        .command(fullPath)
-        .description((cmd as CommandHandler).description || "无描述"); // 添加默认描述
-
-      const handler = cmd as CommandHandler;
-      if (handler.setup) {
-        try {
-          handler.setup(command);
-        } catch (error) {
-          logger.warn(
-            `插件 ${plugin.name} 的命令 ${cmdPath} 设置参数时发生错误: ${error}`
-          );
-          continue;
-        }
-      }
-
-      command.action(async (...args) => {
-        try {
-          await handler.execute(args.slice(0, -1), {
-            logger,
-            ai: {
-              generate: async ({ prompt }: { prompt: string }) => {
-                console.log("Debug - AI 收到的 prompt:", prompt);
-                return "测试提交: 更新了代码";
-              },
-            },
-            config: {
-              get: async () => null,
-              set: async () => {},
-            },
-          });
-        } catch (error) {
-          if (error instanceof Error) {
-            logger.error(`${plugin.name} ${cmdPath}: ${error.message}`);
-          } else {
-            logger.error(`${plugin.name} ${cmdPath}: 命令执行失败`);
-          }
-        }
-      });
+  pluginLoader.list().forEach((plugin) => {
+    let cmd: Command;
+    if (plugin.commandPrefix) {
+      cmd = program.command(plugin.commandPrefix);
+    } else {
+      cmd = program.command(plugin.name);
     }
-  }
 
-  program
+    cmd
+      .description(plugin.description)
+      .addHelpText("after", plugin.description);
+    Object.entries(plugin.commands || {}).forEach(([cmdPath, cmdHandler]) => {
+      cmd
+        .command(cmdPath)
+        .description(cmdHandler.description)
+        .addHelpText("after", cmdHandler.description)
+        .action(async (...args: string[]) => {
+            await cmdHandler.execute(args, commandContext);
+        });
+    });
+  });
+
+  const pluginCommand = program
     .command("plugin")
     .description("插件管理命令")
     .addHelpText(
@@ -103,10 +75,10 @@ async function main() {
 `
     );
 
-  program
-    .command("plugin remove <name>")
+  pluginCommand
+    .command("remove <name>")
     .description("移除插件，例如: agent plugin remove git-assistant")
-    .action(async (name) => {
+    .action(async (name: string) => {
       try {
         await pluginLoader.unload(name);
         logger.info(`插件 ${name} 移除成功`);
@@ -115,9 +87,15 @@ async function main() {
       }
     });
 
-  program
-    .command("plugin list")
+  pluginCommand
+    .command("list")
     .description("列出所有已安装的插件")
+    .addHelpText(
+      "after",
+      `
+plugin list 命令用于列出所有已安装的插件。
+`
+    )
     .action(() => {
       const plugins = pluginLoader.list();
       if (plugins.length === 0) {
@@ -130,10 +108,10 @@ async function main() {
       }
     });
 
-  program
-    .command("plugin load <path>")
+  pluginCommand
+    .command("load <path>")
     .description("从本地路径加载插件，例如: agent plugin load ./my-plugin")
-    .action(async (pluginPath) => {
+    .action(async (pluginPath: string) => {
       try {
         await pluginLoader.load(pluginPath);
         logger.info(`插件从 ${pluginPath} 加载成功`);
@@ -142,10 +120,10 @@ async function main() {
       }
     });
 
-  program
-    .command("plugin dev <path>")
+  pluginCommand
+    .command("dev <path>")
     .description("开发模式：监视插件变化并自动重新加载")
-    .action(async (pluginPath) => {
+    .action(async (pluginPath: string) => {
       try {
         logger.info(`开发模式：监视插件 ${pluginPath}`);
 

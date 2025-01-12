@@ -1,18 +1,14 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "declaration": true,
-    "declarationMap": true,
+    "module": "CommonJS",
     "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "incremental": false
+    "forceConsistentCasingInFileNames": true
   },
-  "references": [
-    { "path": "packages/sdk" },
-    { "path": "packages/cli" }
-  ]
+  "include": ["packages/**/*.ts"],
+  "exclude": ["node_modules"]
 }
